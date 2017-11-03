@@ -1,8 +1,8 @@
 desc 'Opens a pry session with the project files loaded'
 task :console do
-  require 'bundler'
+  require 'bundler/setup'
   require 'pry'
-  Bundler.setup
+  Bundler.require
   ARGV.clear
   binding.pry
 end
