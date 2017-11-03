@@ -1,5 +1,3 @@
-require 'modules/process_unit.rb'
-
 describe ProcessUnit do
   subject {
     ProcessUnit.new(init_time: 2,
