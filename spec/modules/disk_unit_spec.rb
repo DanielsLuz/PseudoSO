@@ -15,6 +15,14 @@ describe DiskUnit do
       expect(subject[0..1]).to eq ["X", "X"]
       expect(subject.written_blocks).to eq 2
     end
+
+    context "when space required fails" do
+      it "doesn't write" do
+        subject.write("X", 2, 2)
+        subject.write("A", 0, 3)
+        expect(subject.written_blocks).to eq 2
+      end
+    end
   end
 
   describe ".delete" do

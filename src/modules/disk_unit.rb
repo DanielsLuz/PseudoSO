@@ -6,6 +6,7 @@ class DiskUnit
   end
 
   def write(data, address, size)
+    return false unless @disk[address..address + (size - 1)].all?(&:nil?)
     @disk[address..address + (size - 1)] = Concurrent::Array.new(size, data)
   end
 
