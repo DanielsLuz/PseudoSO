@@ -9,3 +9,7 @@ group :development do
   gem 'rake'
   gem 'rspec'
 end
+
+group :test do
+  gem 'pry-byebug'
+end
