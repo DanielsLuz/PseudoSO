@@ -18,4 +18,14 @@ describe ProcessUnit do
 
   it { is_expected.to be_a ProcessUnit }
   it { is_expected.to have_attributes attributes }
+
+  describe ".step" do
+    it "returns the next instruction" do
+      subject.instructions = [:default, :write, :delete]
+      expect(subject.step).to eq :default
+      expect(subject.step).to eq :write
+      expect(subject.step).to eq :delete
+      expect(subject.step).to eq nil
+    end
+  end
 end

@@ -1,5 +1,6 @@
 class ProcessUnit
   attr_reader :id, :init_time, :priority, :processor_time, :memory_blocks, :printer, :scanner, :modem, :num_code_disk
+  attr_reader :instruction_index
   attr_accessor :instructions
 
   def initialize(id, init_time, priority, processor_time, memory_blocks, printer, scanner, modem, num_code_disk)
@@ -13,6 +14,12 @@ class ProcessUnit
     @modem = modem
     @num_code_disk = num_code_disk
     @instructions = Concurrent::Array.new processor_time, :default
+    @instruction_index = -1
+  end
+
+  def step
+    @instruction_index += 1
+    @instructions[@instruction_index]
   end
 
   def replace_default_instruction(operation, data, size)
