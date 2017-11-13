@@ -1,9 +1,20 @@
 class Dispatcher
   attr_accessor :processes
-  attr_reader :disk_unit
+  attr_reader :disk_unit, :processor_time
 
   def initialize
     @processes = Concurrent::Array.new []
+    @processor_time = 0
+  end
+
+  def run
+    loop do
+      process = @processes.shift
+      last_step = process.step
+      @processes << process unless last_step.nil?
+      break if @processes.empty?
+      @processor_time += 1
+    end
   end
 
   def load_processes(filename)
