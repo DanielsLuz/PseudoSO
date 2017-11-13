@@ -1,6 +1,7 @@
 describe ProcessUnit do
   let(:attributes) {
     {
+      id:             0,
       init_time:      2,
       priority:       0,
       processor_time: 7,
@@ -8,11 +9,12 @@ describe ProcessUnit do
       printer:        1,
       scanner:        0,
       modem:          0,
-      num_code_disk:  0
+      num_code_disk:  0,
+      instructions:   Concurrent::Array.new(7, :default)
     }
   }
 
-  subject { ProcessUnit.new(2, 0, 7, 64, 1, 0, 0, 0) }
+  subject { ProcessUnit.new(0, 2, 0, 7, 64, 1, 0, 0, 0) }
 
   it { is_expected.to be_a ProcessUnit }
   it { is_expected.to have_attributes attributes }
