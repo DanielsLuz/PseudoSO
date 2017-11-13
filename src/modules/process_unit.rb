@@ -23,7 +23,7 @@ class ProcessUnit
   end
 
   def replace_default_instruction(operation, data, size)
-    @instructions[@instructions.index(:default)] = "#{operation}, #{data}, #{size || 0}"
+    @instructions[@instructions.index(:default)] = parse_instruction(operation, data, size)
   end
 
   def attributes
@@ -39,5 +39,16 @@ class ProcessUnit
       num_code_disk:  @num_code_disk,
       instructions:   @instructions
     }
+  end
+
+  private
+
+  def parse_instruction(operation, data, size)
+    case operation
+    when "0"
+      [:write, data, size.to_i]
+    when "1"
+      [:delete, data]
+    end
   end
 end

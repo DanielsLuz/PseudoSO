@@ -21,11 +21,27 @@ describe ProcessUnit do
 
   describe ".step" do
     it "returns the next instruction" do
-      subject.instructions = [:default, :write, :delete]
-      expect(subject.step).to eq :default
-      expect(subject.step).to eq :write
-      expect(subject.step).to eq :delete
+      subject.instructions = [[:default], [:write, "A", 2], [:delete, "A"]]
+      expect(subject.step).to eq [:default]
+      expect(subject.step).to eq [:write, "A", 2]
+      expect(subject.step).to eq [:delete, "A"]
       expect(subject.step).to eq nil
+    end
+  end
+
+  describe ".replace_default_instruction" do
+    context "when #write instruction" do
+      it "parses correctly" do
+        subject.replace_default_instruction("0", "B", "2")
+        expect(subject.instructions).to include([:write, "B", 2])
+      end
+    end
+
+    context "when #delete instruction" do
+      it "parses correctly" do
+        subject.replace_default_instruction("1", "A", nil)
+        expect(subject.instructions).to include([:delete, "A"])
+      end
     end
   end
 end

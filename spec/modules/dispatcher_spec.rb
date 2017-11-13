@@ -45,7 +45,7 @@ describe Dispatcher do
       process0 = ProcessUnit.new(0, 2, 0, 7, 64, 1, 0, 0, 0)
       subject.processes << process0
       subject.load_files_data(fixture_file("files_instructions.txt"))
-      expect(process0.instructions).to include("0, B, 2", "1, A, 0")
+      expect(process0.instructions).to include([:write, "B", 2], [:delete, "A"])
     end
   end
 end
