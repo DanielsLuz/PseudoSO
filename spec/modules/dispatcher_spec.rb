@@ -20,6 +20,15 @@ describe Dispatcher do
     end
   end
 
+  describe "#alocated_adress" do
+    let(:dispatcher) { Dispatcher.new }
+
+    it "does not alocate if it is too big" do
+      process1 = ProcessUnit.new(0, 2, 0, 7, 1000, 1, 0, 0, 0)
+      expect(dispatcher.alocated_adress(process1)).to eq nil
+    end
+  end
+
   describe "#load_processes" do
     let(:first_process) { ProcessUnit.new(0, 2, 0, 7, 64, 1, 0, 0, 0) }
     let(:last_process) { ProcessUnit.new(2, 3, 1, 2, 64, 0, 0, 1, 0) }

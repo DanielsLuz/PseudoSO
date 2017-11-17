@@ -30,11 +30,16 @@ class MemoryUnit
   # Metodo responsavel por inserir o processo
   # no primeiro espaço de memoria livre 
   def alocate(process)
+    return alocated(process) if alocated(process)
     memory = process.real_time_process? ? @real_time_memory : @user_memory
     address = initial_address(memory, process)
-    return false if address.nil?
+    return nil if address.nil?
     write(memory, address, process)
     address
+  end
+
+  def alocated(process)
+    (@user_memory + @real_time_memory).index(process.id)
   end
 
   # Metodo responsavel por contar a quantidade

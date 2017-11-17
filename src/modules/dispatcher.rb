@@ -4,17 +4,26 @@ class Dispatcher
 
   def initialize
     @processes = Concurrent::Array.new []
+    @memory_unit = MemoryUnit.new
     @processor_time = 0
   end
 
   def run
     loop do
       process = @processes.shift
-      last_step = process.step
-      @processes << process unless last_step.nil?
+      if alocated_adress(process)
+        last_step = process.step
+        @processes << process unless last_step.nil?
+      else
+        @processes << process
+      end
       break if @processes.empty?
       @processor_time += 1
     end
+  end
+
+  def alocated_adress(process)
+    @memory_unit.alocate(process)
   end
 
   def load_processes(filename)
