@@ -1,7 +1,7 @@
 describe Dispatcher do
   subject(:dispatcher) { Dispatcher.new }
 
-  describe ".run" do
+  describe "#run" do
     before(:each) do
       disk_unit = DiskUnit.new(10)
 

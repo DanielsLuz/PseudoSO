@@ -15,24 +15,26 @@ describe MemoryUnit do
 
   it { is_expected.to have_attributes attributes }
 
-  describe ".alocate" do
-    let(:process0) { ProcessUnit.new(0, 2, 0, 7, 64, 1, 0, 0, 0) }
+  describe "#alocate" do
+    context "when user process" do
+      let(:user_process) { ProcessUnit.new(0, 2, 1, 7, 64, 1, 0, 0, 0) }
 
-    it "alocates correctly" do
-      expect(memory_unit.alocate(process0)).to eq 0
-      expect(memory_unit.written_blocks).to eq process0.memory_blocks
-    end
+      it "alocates correctly" do
+        expect(memory_unit.alocate(user_process)).to eq 0
+        expect(memory_unit.written_blocks).to eq user_process.memory_blocks
+      end
 
-    context "when initial blocks written" do
-      it "writes with offset" do
-        memory_unit = MemoryUnit.new(Concurrent::Array.new(64), written_user_memory)
-        expect(memory_unit.alocate(process0)).to eq 24
-        expect(memory_unit.written_blocks).to eq 88
+      context "when initial blocks written" do
+        it "writes with offset" do
+          memory_unit = MemoryUnit.new(Concurrent::Array.new(64), written_user_memory)
+          expect(memory_unit.alocate(user_process)).to eq 24
+          expect(memory_unit.written_blocks).to eq 88
+        end
       end
     end
   end
 
-  describe ".written_blocks" do
+  describe "#written_blocks" do
     it "returns correctly" do
       memory_unit = MemoryUnit.new(Concurrent::Array.new(64), written_user_memory)
       expect(memory_unit.written_blocks).to eq 24

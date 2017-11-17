@@ -9,7 +9,7 @@ describe DiskUnit do
   it { is_expected.to be_a DiskUnit }
   it { is_expected.to have_attributes attributes }
 
-  describe ".write" do
+  describe "#write" do
     it "writes correctly" do
       subject.write("X", 0, 2)
       expect(subject[0..1]).to eq ["X", "X"]
@@ -25,7 +25,7 @@ describe DiskUnit do
     end
   end
 
-  describe ".delete" do
+  describe "#delete" do
     it "deletes correctly" do
       subject.write("X", 0, 3)
       expect(subject.written_blocks).to eq 3

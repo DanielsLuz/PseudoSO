@@ -19,7 +19,7 @@ describe ProcessUnit do
   it { is_expected.to be_a ProcessUnit }
   it { is_expected.to have_attributes attributes }
 
-  describe ".step" do
+  describe "#step" do
     it "returns the next instruction" do
       subject.instructions = [[:default], [:write, "A", 2], [:delete, "A"]]
       expect(subject.step).to eq [:default]
@@ -29,7 +29,7 @@ describe ProcessUnit do
     end
   end
 
-  describe ".replace_default_instruction" do
+  describe "#replace_default_instruction" do
     context "when #write instruction" do
       it "parses correctly" do
         subject.replace_default_instruction("0", "B", "2")
