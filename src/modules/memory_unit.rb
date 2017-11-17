@@ -10,7 +10,6 @@
 # blocos para processos de tempo real e 960 para processos
 # de usuário. Os métodos dessa classe envolvem operações 
 # de escrita e deleção de "processos" na memória simulada.
-
 class MemoryUnit
 
   # Construtor responsável pela inicialização dos 
@@ -28,7 +27,8 @@ class MemoryUnit
     @real_time_memory.size + @user_memory.size
   end
 
-  # Método 
+  # Método responsável por inserir o processo
+  # no primeiro espaço de memória livre 
   def alocate(process)
     memory = process.real_time_process? ? @real_time_memory : @user_memory
     address = initial_address(memory, process)
@@ -37,17 +37,24 @@ class MemoryUnit
     address
   end
 
-  # Método 
+  # Método responsável por contar a quantidade
+  # de blocos preenchidos na memória RAM
   def written_blocks
     (@real_time_memory + @user_memory).reject(&:nil?).count
   end
 
   private
 
+  # Método responsável pela escritao de
+  # um processo na posição de memória
+  # passada como parâmetro
   def write(memory, address, process)
     memory[address, process.memory_blocks] = Concurrent::Array.new(process.memory_blocks, process.id)
   end
 
+  # Método responsável por retornar o 
+  # índice do primeiro bloco capaz
+  # de alocar o processo
   def initial_address(memory, process)
     initial_address = nil
     memory.each_with_index {|elem, index|
@@ -58,4 +65,5 @@ class MemoryUnit
     }
     initial_address
   end
+  
 end
