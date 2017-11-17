@@ -17,6 +17,14 @@ class ProcessUnit
     @instruction_index = -1
   end
 
+  def user_process?
+    @priority > 0
+  end
+
+  def real_time_process?
+    @priority.zero?
+  end
+
   def step
     @instruction_index += 1
     @instructions[@instruction_index]
