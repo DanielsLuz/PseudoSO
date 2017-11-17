@@ -19,6 +19,23 @@ describe ProcessUnit do
   it { is_expected.to be_a ProcessUnit }
   it { is_expected.to have_attributes attributes }
 
+  describe "#user_process?" do
+    [1, 2, 3].each do |priority|
+      it "returns true when priority is #{priority}" do
+        process = ProcessUnit.new(0, 2, priority, 7, 64, 1, 0, 0, 0)
+        expect(process).to be_a_user_process
+      end
+    end
+  end
+
+  describe "#real_time_process?" do
+    let(:priority) { 0 }
+    it "returns true when priority is 0" do
+      process = ProcessUnit.new(0, 2, priority, 7, 64, 1, 0, 0, 0)
+      expect(process).to be_a_real_time_process
+    end
+  end
+
   describe "#step" do
     it "returns the next instruction" do
       subject.instructions = [[:default], [:write, "A", 2], [:delete, "A"]]
