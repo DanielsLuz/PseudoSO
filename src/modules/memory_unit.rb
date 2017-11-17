@@ -2,33 +2,33 @@
 # @Author Guido Dutra Oliveira
 # @Author Luiz Fernando Vieira
 # @date Novembro, 2017
-# @brief Unidade de Memória RAM
+# @brief Unidade de Memoria RAM
 #
-# Arquivo responsável pela representação e manipulação da 
-# memória RAM utilizada pelo SO simulado. Essa memória RAM
-# é dividida em duas partes. A primeira é composta por 64
+# Arquivo responsavel pela representacao e manipulacao da 
+# memoria RAM utilizada pelo SO simulado. Essa memoria RAM
+# e dividida em duas partes. A primeira e composta por 64
 # blocos para processos de tempo real e 960 para processos
-# de usuário. Os métodos dessa classe envolvem operações 
-# de escrita e deleção de "processos" na memória simulada.
+# de usuario. Os metodos dessa classe envolvem operacoes 
+# de escrita e delecao de "processos" na memoria simulada.
 class MemoryUnit
 
-  # Construtor responsável pela inicialização dos 
+  # Construtor responsavel pela inicializacao dos 
   # arrays que armazenam os processos de tempo real 
-  # e os processos de usuário
+  # e os processos de usuario
   def initialize(real_time_memory=Concurrent::Array.new(64), user_memory=Concurrent::Array.new(960))
     @real_time_memory = real_time_memory
     @user_memory = user_memory
   end
 
-  # Método responsável pela soma dos tamanhos
+  # Metodo responsavel pela soma dos tamanhos
   # do array de processos de tempo real com
-  # o array de processos do usuário
+  # o array de processos do usuario
   def size
     @real_time_memory.size + @user_memory.size
   end
 
-  # Método responsável por inserir o processo
-  # no primeiro espaço de memória livre 
+  # Metodo responsavel por inserir o processo
+  # no primeiro espaço de memoria livre 
   def alocate(process)
     memory = process.real_time_process? ? @real_time_memory : @user_memory
     address = initial_address(memory, process)
@@ -37,23 +37,23 @@ class MemoryUnit
     address
   end
 
-  # Método responsável por contar a quantidade
-  # de blocos preenchidos na memória RAM
+  # Metodo responsavel por contar a quantidade
+  # de blocos preenchidos na memoria RAM
   def written_blocks
     (@real_time_memory + @user_memory).reject(&:nil?).count
   end
 
   private
 
-  # Método responsável pela escritao de
-  # um processo na posição de memória
-  # passada como parâmetro
+  # Metodo responsavel pela escritao de
+  # um processo na posicao de memoria
+  # passada como parametro
   def write(memory, address, process)
     memory[address, process.memory_blocks] = Concurrent::Array.new(process.memory_blocks, process.id)
   end
 
-  # Método responsável por retornar o 
-  # índice do primeiro bloco capaz
+  # Metodo responsavel por retornar o 
+  # indice do primeiro bloco capaz
   # de alocar o processo
   def initial_address(memory, process)
     initial_address = nil
@@ -65,5 +65,5 @@ class MemoryUnit
     }
     initial_address
   end
-  
+
 end
