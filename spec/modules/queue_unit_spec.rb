@@ -41,6 +41,51 @@ describe QueueUnit do
     end
   end
 
+  describe "#age_queues" do
+    let(:process_priority_1) { ProcessUnit.new(0, 2, 1, 7, 64, 1, 0, 0, 0) }
+    let(:process_priority_2) { ProcessUnit.new(0, 2, 2, 7, 64, 1, 0, 0, 0) }
+    let(:process_priority_3) { ProcessUnit.new(0, 2, 3, 7, 64, 1, 0, 0, 0) }
+    it "ages all queues" do
+      subject.push(process_priority_1)
+      subject.push(process_priority_2)
+      subject.push(process_priority_3)
+      subject.age_queues
+      expect(subject.queues[1]).to include(process_priority_1, process_priority_2)
+      expect(subject.queues[2]).to include(process_priority_3)
+      expect(subject.queues[3]).to be_empty
+    end
+  end
+
+  describe "#age" do
+    let(:process_priority_1) { ProcessUnit.new(0, 2, 1, 7, 64, 1, 0, 0, 0) }
+    let(:process_priority_2) { ProcessUnit.new(0, 2, 2, 7, 64, 1, 0, 0, 0) }
+    it "moves process to higher priorities" do
+      subject.push(process_priority_2)
+      subject.age(process_priority_2)
+      expect(subject.queues[1]).to include process_priority_2
+      expect(subject.queues[2]).to_not include process_priority_2
+    end
+
+    it "does not move priority 1 process" do
+      subject.push(process_priority_1)
+      subject.age(process_priority_1)
+      expect(subject.queues[1]).to include process_priority_1
+    end
+  end
+
+  describe "can_age?" do
+    it "returns true if higher priority queue has space" do
+      expect(queue_unit.queues[1]).to receive(:full?).and_return(false)
+      process_priority2 = ProcessUnit.new(0, 2, 2, 7, 64, 1, 0, 0, 0)
+      expect(queue_unit.can_age?(process_priority2)).to eq true
+    end
+
+    it "returns false if priority lesser than 1" do
+      process_priority1 = ProcessUnit.new(0, 2, 1, 7, 64, 1, 0, 0, 0)
+      expect(queue_unit.can_age?(process_priority1)).to eq false
+    end
+  end
+
   describe QueueUnit::PriorityQueue do
     subject { QueueUnit::PriorityQueue.new 0 }
 

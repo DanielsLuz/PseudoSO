@@ -1,6 +1,7 @@
 class QueueUnit
   class PriorityQueue
     attr_reader :priority, :max_size, :queue
+    alias processes queue
 
     def initialize(priority, max_size=1000)
       @max_size = max_size
@@ -17,8 +18,16 @@ class QueueUnit
       @queue.pop
     end
 
+    def delete(process)
+      @queue.delete(process)
+    end
+
     def full?
       @queue.size == @max_size
+    end
+
+    def empty?
+      @queue.empty?
     end
 
     def include?(process)
@@ -52,6 +61,28 @@ class QueueUnit
       break if process
     end
     process
+  end
+
+  def age_queues
+    @queues.each do |priority, priority_queue|
+      next if priority <= 1
+      age_processes(priority_queue)
+    end
+  end
+
+  def age_processes(queue)
+    queue.processes.each do |process|
+      break unless age process
+    end
+  end
+
+  def age(process)
+    return unless can_age?(process)
+    @queues[process.priority - 1].push(@queues[process.priority].delete(process))
+  end
+
+  def can_age?(process)
+    process.priority > 1 && !@queues[process.priority - 1].full?
   end
 
   def real_time_queue
