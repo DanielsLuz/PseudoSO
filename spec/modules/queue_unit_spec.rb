@@ -26,6 +26,17 @@ describe QueueUnit do
     end
   end
 
+  describe "#push_batch" do
+    let(:process0) { ProcessUnit.new(0, 2, 0, 7, 64, 1, 0, 0, 0) }
+    let(:process1) { ProcessUnit.new(1, 2, 1, 7, 64, 1, 0, 0, 0) }
+    it "pushes given an array" do
+      process_array = [process0, process1]
+      expect(queue_unit).to receive(:push).with(process0).once
+      expect(queue_unit).to receive(:push).with(process1).once
+      queue_unit.push_batch(process_array)
+    end
+  end
+
   let(:process_priority_0) { ProcessUnit.new(0, 2, 0, 7, 64, 1, 0, 0, 0) }
   let(:process_priority_1) { ProcessUnit.new(0, 2, 1, 7, 64, 1, 0, 0, 0) }
   let(:process_priority_2) { ProcessUnit.new(0, 2, 2, 7, 64, 1, 0, 0, 0) }

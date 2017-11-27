@@ -50,6 +50,10 @@ class QueueUnit
     end
   end
 
+  def push_batch(process_array)
+    process_array.each {|process| push(process) }
+  end
+
   def push(process)
     @queues[process.priority].push(process)
   end
