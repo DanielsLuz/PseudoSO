@@ -25,8 +25,7 @@ class Dispatcher
 
   def execute(process)
     return unless alocated_adress(process)
-    process.step
-    # execute process instruction
+    execute_instruction(process.step)
     if process.finished?
       dealocate(process)
     else
