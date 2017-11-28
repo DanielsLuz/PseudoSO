@@ -46,6 +46,14 @@ describe ProcessUnit do
     end
   end
 
+  describe "#finished?" do
+    it "returns true if next instruction is nil" do
+      subject.instructions = [[:default]]
+      subject.step
+      expect(subject).to be_finished
+    end
+  end
+
   describe "#replace_default_instruction" do
     context "when #write instruction" do
       it "parses correctly" do

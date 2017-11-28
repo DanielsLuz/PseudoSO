@@ -48,6 +48,10 @@ class ProcessUnit
     @instructions[@instruction_index]
   end
 
+  def finished?
+    @instructions[@instruction_index + 1].nil?
+  end
+
   # Metodo responsavel por substituir
   # 
   def replace_default_instruction(operation, data, size)

@@ -18,23 +18,31 @@ class Dispatcher
   def step
     @queue_unit.push_batch(arriving_processes)
     process = @queue_unit.pop
-    if process
-      if alocated_adress(process)
-        last_step = process.step
-        @queue_unit.push(process) unless last_step.nil?
-      else
-        @queue_unit.push(process)
-      end
-    end
+    execute(process) if process
     @processor_time += 1
+  end
+
+  def execute(process)
+    return unless alocated_adress(process)
+    process.step
+    # execute process instruction
+    if process.finished?
+      dealocate(process)
+    else
+      @queue_unit.push(process)
+    end
   end
 
   def alocated_adress(process)
     @memory_unit.alocate(process)
   end
 
+  def dealocate(process)
+    @memory_unit.dealocate(process)
+  end
+
   def arriving_processes
-    @processes.select {|proc| proc.init_time == @processor_time}
+    @processes.select {|proc| proc.init_time == @processor_time }
   end
 
   def load_processes(filename)
