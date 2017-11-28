@@ -1,29 +1,40 @@
 class Dispatcher
   attr_accessor :processes
-  attr_reader :disk_unit, :processor_time
+  attr_reader :disk_unit, :processor_time, :queue_unit
 
   def initialize
     @processes = Concurrent::Array.new []
     @memory_unit = MemoryUnit.new
+    @queue_unit = QueueUnit.new
     @processor_time = 0
   end
 
   def run
     loop do
-      process = @processes.shift
+      step
+    end
+  end
+
+  def step
+    @queue_unit.push_batch(arriving_processes)
+    process = @queue_unit.pop
+    if process
       if alocated_adress(process)
         last_step = process.step
-        @processes << process unless last_step.nil?
+        @queue_unit.push(process) unless last_step.nil?
       else
-        @processes << process
+        @queue_unit.push(process)
       end
-      break if @processes.empty?
-      @processor_time += 1
     end
+    @processor_time += 1
   end
 
   def alocated_adress(process)
     @memory_unit.alocate(process)
+  end
+
+  def arriving_processes
+    @processes.select {|proc| proc.init_time == @processor_time}
   end
 
   def load_processes(filename)
