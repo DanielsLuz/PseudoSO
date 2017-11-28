@@ -40,7 +40,8 @@ class MemoryUnit
 
   def dealocate(process)
     memory = process.real_time_process? ? @real_time_memory : @user_memory
-    memory.delete(process.id)
+    first_index, size = memory.index(process.id), process.memory_blocks
+    memory[first_index, size] = Concurrent::Array.new(size, nil)
   end
 
   def alocated(process)

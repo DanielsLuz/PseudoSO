@@ -38,10 +38,12 @@ describe DiskUnit do
 
   describe "#delete" do
     it "deletes correctly" do
-      subject.write("X", 0, 3)
-      expect(subject.written_blocks).to eq 3
-      subject.delete_file("X")
-      expect(subject.written_blocks).to eq 0
+      expect {
+        subject.write("X", 0, 3)
+        expect(subject.written_blocks).to eq 3
+        subject.delete_file("X")
+        expect(subject.written_blocks).to eq 0
+      }.to_not change(subject, :size)
     end
   end
 end
