@@ -38,6 +38,11 @@ class MemoryUnit
     address
   end
 
+  def dealocate(process)
+    memory = process.real_time_process? ? @real_time_memory : @user_memory
+    memory.delete(process.id)
+  end
+
   def alocated(process)
     (@user_memory + @real_time_memory).index(process.id)
   end

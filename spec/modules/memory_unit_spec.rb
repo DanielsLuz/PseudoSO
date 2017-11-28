@@ -56,6 +56,15 @@ describe MemoryUnit do
     end
   end
 
+  describe "#dealocate" do
+    it "removes a process from memory" do
+      memory_unit.alocate(user_process)
+      expect(memory_unit.alocated(user_process)).to eq 0
+      memory_unit.dealocate(user_process)
+      expect(memory_unit.alocated(user_process)).to eq nil
+    end
+  end
+
   describe "#alocated" do
     it "returns true if process already in memory" do
       expect(memory_unit.alocated(user_process)).to eq nil
