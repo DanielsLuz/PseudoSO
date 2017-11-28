@@ -7,7 +7,12 @@ task :console do
 end
 
 task :run do
+  def remove_logs
+    require 'fileutils'
+    FileUtils.rm_r Dir.glob('logs/*')
+  end
   require './config/application'
   require 'pry'
+  remove_logs
   Dispatcher.new.run
 end

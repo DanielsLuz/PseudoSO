@@ -75,6 +75,10 @@ class ProcessUnit
     }
   end
 
+  def print
+    attributes.to_s
+  end
+
   private
 
   #   
