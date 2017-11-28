@@ -9,6 +9,17 @@ describe DiskUnit do
   it { is_expected.to be_a DiskUnit }
   it { is_expected.to have_attributes attributes }
 
+  describe "#write_file" do
+    it "writes correctly" do
+      subject.write_file("X", 2)
+      expect(subject[0..1]).to eq ["X", "X"]
+      subject.write_file("Z", 2)
+      expect(subject[2..3]).to eq ["Z", "Z"]
+
+      expect(subject.written_blocks).to eq 4
+    end
+  end
+
   describe "#write" do
     it "writes correctly" do
       subject.write("X", 0, 2)

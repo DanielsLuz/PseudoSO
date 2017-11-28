@@ -5,6 +5,13 @@ class DiskUnit
     @disk = Concurrent::Array.new(size)
   end
 
+  def write_file(data, size)
+    address = initial_address(size)
+    return nil if address.nil?
+    write(data, address, size)
+    address
+  end
+
   def write(data, address, size)
     return false unless @disk[address, size].all?(&:nil?)
     @disk[address, size] = Concurrent::Array.new(size, data)
@@ -32,5 +39,17 @@ class DiskUnit
       written: written
     }
   end
-  
+
+  private
+
+  def initial_address(size)
+    initial_address = nil
+    @disk.each_with_index {|elem, index|
+      next unless elem.nil?
+      disk_slot = @disk[index, size]
+      break if disk_slot.size < size
+      return index if disk_slot.all?(&:nil?)
+    }
+    initial_address
+  end
 end
