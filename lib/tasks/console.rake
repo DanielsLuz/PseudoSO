@@ -5,3 +5,9 @@ task :console do
   ARGV.clear
   binding.pry
 end
+
+task :run do
+  require './config/application'
+  require 'pry'
+  Dispatcher.new.run
+end

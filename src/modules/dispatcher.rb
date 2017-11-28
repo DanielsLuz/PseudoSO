@@ -11,6 +11,12 @@ class Dispatcher
   end
 
   def run
+    load_processes(Resources.file("processes.txt"))
+    load_files_data(Resources.file("files.txt"))
+    execute
+  end
+
+  def execute
     loop do
       step
     end
@@ -19,11 +25,11 @@ class Dispatcher
   def step
     @queue_unit.push_batch(arriving_processes)
     process = @queue_unit.pop
-    execute(process) if process
+    execute_process(process) if process
     @processor_time += 1
   end
 
-  def execute(process)
+  def execute_process(process)
     return unless alocated_adress(process)
     execute_instruction(process.step)
     if process.finished?
@@ -82,8 +88,8 @@ class Dispatcher
   def load_instructions(instructions)
     instructions.each do |instruction|
       id, operation, data, size = instruction.split(",").map(&:strip)
-      process = @processes.select {|process| process.id == id.to_i }.first
-      process.replace_default_instruction(operation, data, size)
+      process = @processes.select {|proc| proc.id == id.to_i }.first
+      process.replace_default_instruction(operation, data, size) if process
     end
   end
 end
