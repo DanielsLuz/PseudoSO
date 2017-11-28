@@ -58,14 +58,14 @@ describe ProcessUnit do
     context "when #write instruction" do
       it "parses correctly" do
         subject.replace_default_instruction("0", "B", "2")
-        expect(subject.instructions).to include([:write, "B", 2])
+        expect(subject.instructions).to include([:write_file, "B", 2])
       end
     end
 
     context "when #delete instruction" do
       it "parses correctly" do
         subject.replace_default_instruction("1", "A", nil)
-        expect(subject.instructions).to include([:delete, "A"])
+        expect(subject.instructions).to include([:delete_file, "A"])
       end
     end
   end

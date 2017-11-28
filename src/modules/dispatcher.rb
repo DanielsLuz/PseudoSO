@@ -4,6 +4,7 @@ class Dispatcher
 
   def initialize
     @processes = Concurrent::Array.new []
+    @disk_unit = DiskUnit.new(10)
     @memory_unit = MemoryUnit.new
     @queue_unit = QueueUnit.new
     @processor_time = 0
@@ -31,6 +32,11 @@ class Dispatcher
     else
       @queue_unit.push(process)
     end
+  end
+
+  def execute_instruction(instruction_data)
+    return default_instruction if instruction_data == :default
+    @disk_unit.send(*instruction_data)
   end
 
   def alocated_adress(process)
@@ -62,6 +68,10 @@ class Dispatcher
   end
 
   private
+
+  def default_instruction
+    puts "Executing default instruction..."
+  end
 
   def perform_writing(operations)
     operations.each do |operation|

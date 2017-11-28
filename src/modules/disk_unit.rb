@@ -17,7 +17,7 @@ class DiskUnit
     @disk[address, size] = Concurrent::Array.new(size, data)
   end
 
-  def delete(data)
+  def delete_file(data)
     @disk.delete(data)
   end
 

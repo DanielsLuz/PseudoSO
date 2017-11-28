@@ -45,6 +45,23 @@ describe Dispatcher do
     end
   end
 
+  describe "#execute_instruction" do
+    it "calls the :write method correctly" do
+      expect(dispatcher.disk_unit).to receive(:write_file).with("Z", 2)
+      dispatcher.execute_instruction([:write_file, "Z", 2])
+    end
+
+    it "calls the :delete method correctly" do
+      expect(dispatcher.disk_unit).to receive(:delete_file).with("Z")
+      dispatcher.execute_instruction([:delete_file, "Z"])
+    end
+
+    it "calls the :default_instruction method correctly" do
+      expect(dispatcher).to receive(:default_instruction)
+      dispatcher.execute_instruction(:default)
+    end
+  end
+
   describe "#alocated_adress" do
     let(:dispatcher) { Dispatcher.new }
 
@@ -79,7 +96,7 @@ describe Dispatcher do
       process0 = ProcessUnit.new(0, 2, 0, 7, 64, 1, 0, 0, 0)
       subject.processes << process0
       subject.load_files_data(fixture_file("files_instructions.txt"))
-      expect(process0.instructions).to include([:write, "B", 2], [:delete, "A"])
+      expect(process0.instructions).to include([:write_file, "B", 2], [:delete_file, "A"])
     end
   end
 end

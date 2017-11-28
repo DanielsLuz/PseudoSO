@@ -40,7 +40,7 @@ describe DiskUnit do
     it "deletes correctly" do
       subject.write("X", 0, 3)
       expect(subject.written_blocks).to eq 3
-      subject.delete("X")
+      subject.delete_file("X")
       expect(subject.written_blocks).to eq 0
     end
   end

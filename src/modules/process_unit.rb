@@ -82,9 +82,9 @@ class ProcessUnit
   def parse_instruction(operation, data, size)
     case operation
     when "0"
-      [:write, data, size.to_i]
+      [:write_file, data, size.to_i]
     when "1"
-      [:delete, data]
+      [:delete_file, data]
     end
   end
 
