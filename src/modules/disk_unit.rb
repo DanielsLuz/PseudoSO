@@ -10,7 +10,7 @@ class DiskUnit
 
   def initialize(size)
     @disk = Concurrent::Array.new(size)
-    @logger = OSLog.create_logger(self.class.to_s)
+    @logger = OSLog.instance
   end
 
   def write_file(data, size)
@@ -19,20 +19,20 @@ class DiskUnit
     write(data, address, size)
     address
   rescue SpaceNotAvailableError => error
-    @logger.info("FAILED => #{error.message}")
+    @logger.info(self, "FAILED => #{error.message}")
     return nil
   end
 
   def write(data, address, size)
     return false unless @disk[address, size].all?(&:nil?)
     @disk[address, size] = Concurrent::Array.new(size, data)
-    @logger.info("Created file '#{data}'. Blocks #{address} to #{address + size}.")
+    @logger.info(self, "Created file '#{data}'. Blocks #{address} to #{address + size}.")
   end
 
   def delete_file(data)
     first_index, size = @disk.index(data), @disk.count(data)
     @disk[first_index, size] = Concurrent::Array.new(size, nil)
-    @logger.info("Deleted file '#{data}'.")
+    @logger.info(self, "Deleted file '#{data}'.")
   end
 
   def [](address)

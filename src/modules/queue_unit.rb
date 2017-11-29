@@ -48,15 +48,15 @@ class QueueUnit
     PRIORITIES.each do |priority|
       @queues[priority] = PriorityQueue.new(priority)
     end
-    @logger = OSLog.create_logger(self.class.to_s)
+    @logger = OSLog.instance
   end
 
   def push_batch(process_array)
     return if process_array.empty?
-    @logger.info("Number of arriving processes: #{process_array.count}")
+    @logger.info(self, "Number of arriving processes: #{process_array.count}")
     process_array.each do |process|
       push(process)
-      @logger.info(process.print)
+      @logger.info(self, process.print)
     end
   end
 

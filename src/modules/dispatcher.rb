@@ -8,15 +8,15 @@ class Dispatcher
     @memory_unit = MemoryUnit.new
     @queue_unit = QueueUnit.new
     @processor_time = 0
-    @logger = OSLog.create_logger(self.class.to_s)
+    @logger = OSLog.instance
   end
 
   def run
-    @logger.info("Starting OS...")
+    @logger.info(self, "Starting OS...")
     load_processes(Resources.file("processes.txt"))
     load_files_data(Resources.file("files.txt"))
     execute
-    @logger.info("Final disk: \n#{@disk_unit.disk}")
+    @logger.info(self, "Final disk: \n#{@disk_unit.disk}")
   end
 
   def execute
@@ -31,7 +31,7 @@ class Dispatcher
   end
 
   def execute_process(process)
-    @logger.info("Executing process: PID ##{process.id}")
+    @logger.info(self, "Executing process: PID ##{process.id}")
     return unless alocated_adress(process)
     execute_instruction(process.step)
     if process.finished?
@@ -42,7 +42,7 @@ class Dispatcher
   end
 
   def execute_instruction(instruction_data)
-    @logger.info("Executing instruction: ##{instruction_data}")
+    @logger.info(self, "Executing instruction: ##{instruction_data}")
     return default_instruction if instruction_data == :default
     @disk_unit.send(*instruction_data)
   end
@@ -63,7 +63,7 @@ class Dispatcher
     File.readlines(filename).each_with_index do |line, index|
       @processes << ProcessUnit.new(index, *line.split(",").map(&:to_i))
     end
-    @logger.info("#{@processes.length} processes loaded.")
+    @logger.info(self, "#{@processes.length} processes loaded.")
   end
 
   def load_files_data(filename)
@@ -74,13 +74,13 @@ class Dispatcher
 
     perform_writing(lines[2, write_operations])
     load_instructions(lines[write_operations + 2..-1])
-    @logger.info("Initial disk: \n#{@disk_unit.disk}")
+    @logger.info(self, "Initial disk: \n#{@disk_unit.disk}")
   end
 
   private
 
   def default_instruction
-    @logger.info("Executing default instruction...")
+    @logger.info(self, "Executing default instruction...")
   end
 
   def perform_writing(operations)
