@@ -36,7 +36,7 @@ describe DiskUnit do
     end
   end
 
-  describe "#delete" do
+  describe "#delete_file" do
     it "deletes correctly" do
       expect {
         subject.write("X", 0, 3)

@@ -1,25 +1,38 @@
 class DiskUnit
+  class SpaceNotAvailableError < StandardError
+    attr_accessor :message
+    def initialize(data)
+      @message = "Could not create file '#{data}'. Space not available."
+    end
+  end
+
   attr_reader :disk
 
   def initialize(size)
     @disk = Concurrent::Array.new(size)
+    @logger = OSLog.create_logger(self.class.to_s)
   end
 
   def write_file(data, size)
     address = initial_address(size)
-    return nil if address.nil?
+    raise SpaceNotAvailableError.new(data) unless address
     write(data, address, size)
     address
+  rescue SpaceNotAvailableError => error
+    @logger.info("FAILED => #{error.message}")
+    return nil
   end
 
   def write(data, address, size)
     return false unless @disk[address, size].all?(&:nil?)
     @disk[address, size] = Concurrent::Array.new(size, data)
+    @logger.info("Created file '#{data}'. Blocks #{address} to #{address + size}.")
   end
 
   def delete_file(data)
     first_index, size = @disk.index(data), @disk.count(data)
     @disk[first_index, size] = Concurrent::Array.new(size, nil)
+    @logger.info("Deleted file '#{data}'.")
   end
 
   def [](address)
