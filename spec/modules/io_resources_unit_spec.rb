@@ -61,19 +61,47 @@ describe IOResourceUnit do
     end
   end
 
-  describe "#alocate_scanner" do
+  shared_examples_for "a dealocatable device" do |dealocate_function, device_array, alocate_function|
+    let(:io_resource_unit) { subject.new(device_array => 1) }
+    let(:pid) { 1 }
+
+    context "when alocated for that pid" do
+      before(:each) do
+        io_resource_unit.send(alocate_function, pid)
+      end
+
+      it "dealocates correctly" do
+        io_resource_unit.send(dealocate_function, pid)
+        expect(io_resource_unit.send(device_array)).to_not include(pid)
+      end
+    end
+
+    context "when not alocated for that pid" do
+      it "behaves correctly" do
+        io_resource_unit.send(dealocate_function, pid)
+        expect(io_resource_unit.send(device_array)).to_not include(pid)
+        expect(io_resource_unit.send(device_array)).to have_length_of(1)
+      end
+    end
+  end
+
+  describe "scanners" do
     it_behaves_like "an alocatable device", :alocate_scanner, :scanners
+    it_behaves_like "a dealocatable device", :dealocate_scanner, :scanners, :alocate_scanner
   end
 
-  describe "#alocate_printer" do
+  describe "printers" do
     it_behaves_like "an alocatable device", :alocate_printer, :printers
+    it_behaves_like "a dealocatable device", :dealocate_printer, :printers, :alocate_printer
   end
 
-  describe "#alocate_modem" do
+  describe "modems" do
     it_behaves_like "an alocatable device", :alocate_modem, :modems
+    it_behaves_like "a dealocatable device", :dealocate_modem, :modems, :alocate_modem
   end
 
-  describe "#alocate_sata_device" do
+  describe "sata_devices" do
     it_behaves_like "an alocatable device", :alocate_sata_device, :sata_devices
+    it_behaves_like "a dealocatable device", :dealocate_sata_device, :sata_devices, :alocate_sata_device
   end
 end

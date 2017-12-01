@@ -20,22 +20,43 @@ class IOResourceUnit
     alocate(@scanners, pid)
   end
 
+  def dealocate_scanner(pid)
+    dealocate(@scanners, pid)
+  end
+
   def alocate_printer(pid)
     alocate(@printers, pid)
+  end
+
+  def dealocate_printer(pid)
+    dealocate(@printers, pid)
   end
 
   def alocate_modem(pid)
     alocate(@modems, pid)
   end
 
+  def dealocate_modem(pid)
+    dealocate(@modems, pid)
+  end
+
   def alocate_sata_device(pid)
     alocate(@sata_devices, pid)
   end
 
+  def dealocate_sata_device(pid)
+    dealocate(@sata_devices, pid)
+  end
+
   private
 
-  def alocate(device, pid)
-    return unless device.index(nil)
-    device[device.index(nil)] = pid
+  def alocate(device_array, pid)
+    return unless device_array.index(nil)
+    device_array[device_array.index(nil)] = pid
+  end
+
+  def dealocate(device_array, pid)
+    return unless device_array.include?(pid)
+    device_array[device_array.index(pid)] = nil
   end
 end
