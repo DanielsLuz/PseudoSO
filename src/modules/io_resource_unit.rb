@@ -29,6 +29,12 @@ class IOResourceUnit
     end
   end
 
+  def dealocate_devices(pid)
+    @devices.each do |_device, device_array|
+      dealocate(device_array, pid)
+    end
+  end
+
   def can_alocate_all?(devices)
     devices.map {|device|
       can_alocate?(device)

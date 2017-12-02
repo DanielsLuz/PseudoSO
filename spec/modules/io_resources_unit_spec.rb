@@ -134,6 +134,19 @@ describe IOResourceUnit do
     end
   end
 
+  describe "#dealocate_devices" do
+    let(:io_resource_unit) { subject.new }
+    let(:pid) { 0 }
+    it "dealocates all devices of a given pid" do
+      io_resource_unit.alocate_devices(pid, [:scanner, :printer])
+      expect(io_resource_unit.scanners).to include(pid)
+      expect(io_resource_unit.printers).to include(pid)
+      io_resource_unit.dealocate_devices(pid)
+      expect(io_resource_unit.scanners).to_not include(pid)
+      expect(io_resource_unit.printers).to_not include(pid)
+    end
+  end
+
   describe "#can_alocate_all?" do
     it "returns true if every device given can be alocated" do
       io_resource_unit = subject.new
