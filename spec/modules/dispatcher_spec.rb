@@ -21,6 +21,7 @@ describe Dispatcher do
   end
 
   describe "#step" do
+    let(:process_init_time0) { ProcessUnit.new(0, 0, 0, 7, 64, 1, 0, 0, 0) }
     let(:process_init_time1) { ProcessUnit.new(1, 1, 1, 7, 64, 1, 0, 0, 0) }
 
     it "does not push until processor time matches" do
@@ -34,8 +35,21 @@ describe Dispatcher do
       expect(dispatcher.queue_unit.queues[1]).to include(process_init_time1)
     end
 
+    it "does not push process back if finished" do
+      expect(process_init_time0).to receive(:finished?).and_return true
+      dispatcher.processes = [process_init_time0]
+      dispatcher.step
+      expect(dispatcher.queue_unit.queues[0]).to_not include(process_init_time0)
+    end
+
+    it "does push process back if alocation fails" do
+      expect(dispatcher).to receive(:alocate).with(process_init_time0).and_return false
+      dispatcher.processes = [process_init_time0]
+      dispatcher.step
+      expect(dispatcher.queue_unit.queues[0]).to include(process_init_time0)
+    end
+
     context "when escalonating" do
-      let(:process_init_time0) { ProcessUnit.new(0, 0, 0, 7, 64, 1, 0, 0, 0) }
       let(:big_process_init_time0) { ProcessUnit.new(0, 0, 0, 7, 1000, 1, 0, 0, 0) }
 
       it "pushes processes that start at that processor time" do

@@ -35,10 +35,11 @@ class Dispatcher
   end
 
   def execute_process(process)
-    @logger.info(self, "Executing process: PID ##{process.id}")
-    return unless alocate(process)
-    execute_instruction(process.step)
+    @logger.info(self, "Executing process (priority #{process.priority}): PID ##{process.id}")
+    execute_instruction(process.step) if alocate(process)
+
     if process.finished?
+      @logger.info(self, "Process ##{process.id} finished...")
       dealocate(process)
     else
       @queue_unit.push(process)
@@ -118,7 +119,9 @@ class Dispatcher
   end
 
   def alocate_devices(process)
-    @io_resource_unit.alocate_devices(process.id, process.devices)
+    devices = process.devices
+    return true if process.devices.empty?
+    @io_resource_unit.alocate_devices(process.id, devices)
   end
 
   def perform_writing(operations)
