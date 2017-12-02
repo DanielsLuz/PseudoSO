@@ -131,6 +131,14 @@ describe IOResourceUnit do
         expect(io_resource_unit).to receive(:can_alocate_all?).with(devices).and_return(false)
         expect(io_resource_unit.alocate_devices(0, devices)).to eq false
       end
+
+      it "does not alocate the same pid twice" do
+        devices = [:printer] # we have two printers, but the pid should only alocate one
+        2.times do
+          io_resource_unit.alocate_devices(pid, devices)
+        end
+        expect(io_resource_unit.printers).to eq [pid, nil]
+      end
     end
   end
 
@@ -160,6 +168,20 @@ describe IOResourceUnit do
         devices = [:scanner, :printer, :modem, :sata_device]
         expect(io_resource_unit.can_alocate_all?(devices)).to eq false
       end
+    end
+  end
+
+  describe "#devices_alocated?" do
+    let(:io_resource_unit) { subject.new }
+    let(:pid) { 0 }
+    let(:devices) { [:scanner, :printer] }
+    it "returns true if given pid already alocated" do
+      io_resource_unit.alocate_devices(pid, devices)
+      expect(io_resource_unit.devices_alocated?(pid, devices)).to eq true
+    end
+
+    it "returns false if given pid is not alocated" do
+      expect(io_resource_unit.devices_alocated?(pid, devices)).to eq false
     end
   end
 end

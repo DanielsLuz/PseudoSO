@@ -23,6 +23,7 @@ class IOResourceUnit
   end
 
   def alocate_devices(pid, devices)
+    return true if devices_alocated?(pid, devices)
     return false unless can_alocate_all? devices
     devices.each do |device|
       public_send("alocate_#{device}", pid)
@@ -38,6 +39,12 @@ class IOResourceUnit
   def can_alocate_all?(devices)
     devices.map {|device|
       can_alocate?(device)
+    }.all?
+  end
+
+  def devices_alocated?(pid, devices)
+    devices.map {|device|
+      alocated?(pid, device)
     }.all?
   end
 
@@ -87,5 +94,9 @@ class IOResourceUnit
 
   def can_alocate?(device)
     @devices[device].index(nil)
+  end
+
+  def alocated?(pid, device)
+    @devices[device].index(pid)
   end
 end
