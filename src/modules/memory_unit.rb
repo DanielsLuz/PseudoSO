@@ -19,6 +19,7 @@ class MemoryUnit
   def initialize(real_time_memory=Concurrent::Array.new(64), user_memory=Concurrent::Array.new(960))
     @real_time_memory = real_time_memory
     @user_memory = user_memory
+    @logger = OSLog.instance
   end
 
   # Metodo responsavel pela soma dos tamanhos
@@ -41,6 +42,7 @@ class MemoryUnit
 
   def dealocate(process)
     return true unless alocated(process)
+    @logger.info(self, "Dealocating memory for process ##{process.id}...")
     memory = process.real_time_process? ? @real_time_memory : @user_memory
     first_index, size = memory.index(process.id), process.memory_blocks
     memory[first_index, size] = Concurrent::Array.new(size, nil)
