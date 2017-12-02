@@ -6,7 +6,7 @@ class IOResourceUnit
     sata_devices: 2
   }.freeze
 
-  attr_reader :scanners, :printers, :modems, :sata_devices
+  attr_reader :scanners, :printers, :modems, :sata_devices, :devices
 
   def initialize(opts={})
     opts = DEFAULT_DEVICES.merge(opts)
@@ -14,6 +14,25 @@ class IOResourceUnit
     @printers = Concurrent::Array.new opts[:printers]
     @modems = Concurrent::Array.new opts[:modems]
     @sata_devices = Concurrent::Array.new opts[:sata_devices]
+    @devices = {
+      scanner:     @scanners,
+      printer:     @printers,
+      modem:       @modems,
+      sata_device: @sata_devices
+    }
+  end
+
+  def alocate_devices(pid, devices)
+    return false unless can_alocate_all? devices
+    devices.each do |device|
+      public_send("alocate_#{device}", pid)
+    end
+  end
+
+  def can_alocate_all?(devices)
+    devices.map {|device|
+      can_alocate?(device)
+    }.all?
   end
 
   def alocate_scanner(pid)
@@ -58,5 +77,9 @@ class IOResourceUnit
   def dealocate(device_array, pid)
     return unless device_array.include?(pid)
     device_array[device_array.index(pid)] = nil
+  end
+
+  def can_alocate?(device)
+    @devices[device].index(nil)
   end
 end

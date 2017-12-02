@@ -104,4 +104,49 @@ describe IOResourceUnit do
     it_behaves_like "an alocatable device", :alocate_sata_device, :sata_devices
     it_behaves_like "a dealocatable device", :dealocate_sata_device, :sata_devices, :alocate_sata_device
   end
+
+  describe "#alocate_devices" do
+    let(:io_resource_unit) { subject.new }
+    context "when given a pid and an array of devices" do
+      let(:pid) { 0 }
+      it "invokes each alocate function properly" do
+        devices = [:scanner, :printer, :modem, :sata_device]
+        expect(io_resource_unit).to receive(:alocate_scanner).with(pid)
+        expect(io_resource_unit).to receive(:alocate_printer).with(pid)
+        expect(io_resource_unit).to receive(:alocate_modem).with(pid)
+        expect(io_resource_unit).to receive(:alocate_sata_device).with(pid)
+        io_resource_unit.alocate_devices(pid, devices)
+      end
+
+      it "does not invoke if device not in array" do
+        devices = [:scanner]
+        expect(io_resource_unit).to_not receive(:alocate_printer).with(pid)
+        expect(io_resource_unit).to_not receive(:alocate_modem).with(pid)
+        expect(io_resource_unit).to_not receive(:alocate_sata_device).with(pid)
+        io_resource_unit.alocate_devices(pid, devices)
+      end
+
+      it "only alocates if all can be alocated" do
+        devices = [:scanner, :printer, :modem, :sata_device]
+        expect(io_resource_unit).to receive(:can_alocate_all?).with(devices).and_return(false)
+        expect(io_resource_unit.alocate_devices(0, devices)).to eq false
+      end
+    end
+  end
+
+  describe "#can_alocate_all?" do
+    it "returns true if every device given can be alocated" do
+      io_resource_unit = subject.new
+      devices = [:scanner, :printer, :modem, :sata_device]
+      expect(io_resource_unit.can_alocate_all?(devices)).to eq true
+    end
+
+    [:scanners, :printers, :modems, :sata_devices].each do |device|
+      it "returns false if #{device} cannot be alocated" do
+        io_resource_unit = subject.new(device => 0)
+        devices = [:scanner, :printer, :modem, :sata_device]
+        expect(io_resource_unit.can_alocate_all?(devices)).to eq false
+      end
+    end
+  end
 end
