@@ -26,7 +26,7 @@ class IOResourceUnit
     return true if devices_alocated?(pid, devices)
     return false unless can_alocate_all? devices
     devices.each do |device|
-      public_send("alocate_#{device}", pid)
+      alocate(@devices[device], pid)
     end
   end
 
@@ -46,38 +46,6 @@ class IOResourceUnit
     devices.map {|device|
       alocated?(pid, device)
     }.all?
-  end
-
-  def alocate_scanner(pid)
-    alocate(@scanners, pid)
-  end
-
-  def dealocate_scanner(pid)
-    dealocate(@scanners, pid)
-  end
-
-  def alocate_printer(pid)
-    alocate(@printers, pid)
-  end
-
-  def dealocate_printer(pid)
-    dealocate(@printers, pid)
-  end
-
-  def alocate_modem(pid)
-    alocate(@modems, pid)
-  end
-
-  def dealocate_modem(pid)
-    dealocate(@modems, pid)
-  end
-
-  def alocate_sata_device(pid)
-    alocate(@sata_devices, pid)
-  end
-
-  def dealocate_sata_device(pid)
-    dealocate(@sata_devices, pid)
   end
 
   private
