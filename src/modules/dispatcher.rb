@@ -1,12 +1,13 @@
 class Dispatcher
   attr_accessor :processes
-  attr_reader :disk_unit, :processor_time, :queue_unit
+  attr_reader :processor_time, :disk_unit, :queue_unit, :memory_unit, :io_resource_unit
 
   def initialize
     @processes = Concurrent::Array.new []
     @disk_unit = DiskUnit.new(10)
     @memory_unit = MemoryUnit.new
     @queue_unit = QueueUnit.new
+    @io_resource_unit = IOResourceUnit.new
     @processor_time = 0
     @logger = OSLog.instance
   end
@@ -32,7 +33,7 @@ class Dispatcher
 
   def execute_process(process)
     @logger.info(self, "Executing process: PID ##{process.id}")
-    return unless alocated_adress(process)
+    return unless alocate(process)
     execute_instruction(process.step)
     if process.finished?
       dealocate(process)
@@ -47,12 +48,18 @@ class Dispatcher
     @disk_unit.send(*instruction_data)
   end
 
-  def alocated_adress(process)
-    @memory_unit.alocate(process)
+  def alocate(process)
+    if alocate_memory(process) && alocate_devices(process)
+      true
+    else
+      dealocate(process)
+      false
+    end
   end
 
   def dealocate(process)
     @memory_unit.dealocate(process)
+    @io_resource_unit.dealocate_devices(process.id)
   end
 
   def arriving_processes
@@ -81,6 +88,14 @@ class Dispatcher
 
   def default_instruction
     @logger.info(self, "Executing default instruction...")
+  end
+
+  def alocate_memory(process)
+    @memory_unit.alocate(process)
+  end
+
+  def alocate_devices(process)
+    @io_resource_unit.alocate_devices(process.id, process.devices)
   end
 
   def perform_writing(operations)

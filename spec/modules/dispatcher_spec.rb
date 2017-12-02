@@ -42,6 +42,8 @@ describe Dispatcher do
         expect(dispatcher.queue_unit.queues[0]).to include(process_init_time0)
         expect(dispatcher.queue_unit.queues[1]).to_not include(process_init_time1)
       end
+
+      it "does not push process bigger than memory"
     end
   end
 
@@ -62,12 +64,51 @@ describe Dispatcher do
     end
   end
 
-  describe "#alocated_adress" do
+  describe "#alocate" do
     let(:dispatcher) { Dispatcher.new }
+    let(:process) { ProcessUnit.new(1, 2, 0, 7, 64, 1, 0, 0, 0) }
 
-    it "does not alocate if it is too big" do
-      process1 = ProcessUnit.new(0, 2, 0, 7, 1000, 1, 0, 0, 0)
-      expect(dispatcher.alocated_adress(process1)).to eq nil
+    it "alocates memory and devices" do
+      dispatcher.alocate(process)
+      expect(dispatcher.memory_unit.alocated(process)).to be_truthy
+      expect(dispatcher.io_resource_unit.devices_alocated?(process.id, process.devices)).to be_truthy
+    end
+
+    context "when failing either memory or device alocation" do
+      it "fails if only memory fails" do
+        allow(dispatcher.memory_unit).to receive(:alocate).and_return(nil)
+        allow(dispatcher.io_resource_unit).to receive(:alocate_devices).and_return(true)
+
+        expect(dispatcher.alocate(process)).to be_falsey
+      end
+
+      it "fails if only devices fails" do
+        allow(dispatcher.memory_unit).to receive(:alocate).and_return(true)
+        allow(dispatcher.io_resource_unit).to receive(:alocate_devices).and_return(false)
+
+        expect(dispatcher.alocate(process)).to be_falsey
+      end
+
+      it "fails if both fails" do
+        allow(dispatcher.memory_unit).to receive(:alocate).and_return(false)
+        allow(dispatcher.io_resource_unit).to receive(:alocate_devices).and_return(false)
+
+        expect(dispatcher.alocate(process)).to be_falsey
+      end
+
+      it "does not alocate memory if device fails" do
+        allow(dispatcher.io_resource_unit).to receive(:alocate_devices).and_return(false)
+        dispatcher.alocate(process)
+        expect(dispatcher.memory_unit.alocated(process)).to be_falsey
+        expect(dispatcher.io_resource_unit.devices_alocated?(process.id, process.devices)).to be_falsey
+      end
+
+      it "does not device memory if memory fails" do
+        allow(dispatcher.memory_unit).to receive(:alocate).and_return(false)
+        dispatcher.alocate(process)
+        expect(dispatcher.memory_unit.alocated(process)).to be_falsey
+        expect(dispatcher.io_resource_unit.devices_alocated?(process.id, process.devices)).to be_falsey
+      end
     end
   end
 

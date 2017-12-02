@@ -65,6 +65,10 @@ describe MemoryUnit do
         expect(memory_unit.alocated(user_process)).to eq nil
       }.to_not change(memory_unit, :size)
     end
+
+    it "returns true if process was not alocated" do
+      expect(memory_unit.dealocate(user_process)).to eq true
+    end
   end
 
   describe "#alocated" do
