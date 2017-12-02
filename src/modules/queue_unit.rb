@@ -15,7 +15,7 @@ class QueueUnit
     end
 
     def pop
-      @queue.pop
+      @queue.shift
     end
 
     def delete(process)
