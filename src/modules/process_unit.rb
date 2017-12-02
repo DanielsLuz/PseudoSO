@@ -9,6 +9,7 @@
 # Os atributos dos objetos dessa classe são populados 
 # atraves da leitura dos arquivos files.txt e processes.txt
 class ProcessUnit
+  DEVICES = [:printer, :scanner, :modem, :sata_device]
   attr_reader :id, :init_time, :priority, :processor_time, :memory_blocks, :printer, :scanner, :modem, :num_code_disk
   attr_reader :instruction_index
   attr_accessor :instructions
@@ -21,10 +22,10 @@ class ProcessUnit
     @priority = priority
     @processor_time = processor_time
     @memory_blocks = memory_blocks
-    @printer = printer
-    @scanner = scanner
-    @modem = modem
-    @num_code_disk = num_code_disk
+    @printer = printer > 0
+    @scanner = scanner > 0
+    @modem = modem > 0
+    @num_code_disk = num_code_disk > 0
     @instructions = Concurrent::Array.new processor_time, :default
     @instruction_index = -1
   end
@@ -46,6 +47,10 @@ class ProcessUnit
   def step
     @instruction_index += 1
     @instructions[@instruction_index]
+  end
+
+  def devices
+    attributes.select {|key, value| DEVICES.include?(key) && value }.keys
   end
 
   def finished?

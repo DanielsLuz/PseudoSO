@@ -6,10 +6,10 @@ describe ProcessUnit do
       priority:       0,
       processor_time: 7,
       memory_blocks:  64,
-      printer:        1,
-      scanner:        0,
-      modem:          0,
-      num_code_disk:  0,
+      printer:        true,
+      scanner:        false,
+      modem:          false,
+      num_code_disk:  false,
       instructions:   Concurrent::Array.new(7, :default)
     }
   }
@@ -43,6 +43,13 @@ describe ProcessUnit do
       expect(subject.step).to eq [:write, "A", 2]
       expect(subject.step).to eq [:delete, "A"]
       expect(subject.step).to eq nil
+    end
+  end
+
+  describe "#devices" do
+    subject { ProcessUnit.new(0, 2, 0, 7, 64, 1, 0, 0, 0) }
+    it "returns the devices required" do
+      expect(subject.devices).to eq [:printer]
     end
   end
 
