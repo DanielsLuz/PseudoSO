@@ -10,13 +10,13 @@
 # atraves da leitura dos arquivos files.txt e processes.txt
 class ProcessUnit
   DEVICES = [:printer, :scanner, :modem, :sata_device]
-  attr_reader :id, :init_time, :priority, :processor_time, :memory_blocks, :printer, :scanner, :modem, :num_code_disk
+  attr_reader :id, :init_time, :priority, :processor_time, :memory_blocks, :printer, :scanner, :modem, :sata_device
   attr_reader :instruction_index
   attr_accessor :instructions
 
   # Construtor responsavel pela inicializacao  
   # dos atributos do processo
-  def initialize(id, init_time, priority, processor_time, memory_blocks, printer, scanner, modem, num_code_disk)
+  def initialize(id, init_time, priority, processor_time, memory_blocks, printer, scanner, modem, sata_device)
     @id = id
     @init_time = init_time
     @priority = priority
@@ -25,7 +25,7 @@ class ProcessUnit
     @printer = printer > 0
     @scanner = scanner > 0
     @modem = modem > 0
-    @num_code_disk = num_code_disk > 0
+    @sata_device = sata_device > 0
     @instructions = Concurrent::Array.new processor_time, :default
     @instruction_index = -1
   end
@@ -75,7 +75,7 @@ class ProcessUnit
       printer:        @printer,
       scanner:        @scanner,
       modem:          @modem,
-      num_code_disk:  @num_code_disk,
+      sata_device:    @sata_device,
       instructions:   @instructions
     }
   end

@@ -9,7 +9,7 @@ describe ProcessUnit do
       printer:        true,
       scanner:        false,
       modem:          false,
-      num_code_disk:  false,
+      sata_device:    false,
       instructions:   Concurrent::Array.new(7, :default)
     }
   }
