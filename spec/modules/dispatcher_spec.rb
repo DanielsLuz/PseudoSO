@@ -52,7 +52,7 @@ describe Dispatcher do
         expect(dispatcher.queue_unit.queues[0]).to include(process_init_time0)
         expect(dispatcher.processes).to_not include(big_process_init_time0)
         expect(dispatcher.processes).to include(process_init_time0)
-        expect(dispatcher.discarded_processes).to include(big_process_init_time0)
+        expect(dispatcher.discarded_processes).to include([MemoryUnit::ProcessTooBigError, big_process_init_time0])
       end
     end
   end

@@ -58,7 +58,8 @@ class MemoryUnit
 
   def test(process)
     memory = process.real_time_process? ? @real_time_memory : @user_memory
-    raise ProcessTooBigError if process.memory_blocks > memory.size
+    return true if process.memory_blocks <= memory.size
+    raise ProcessTooBigError, "Process is bigger (#{process.memory_blocks} blocks) than total memory"
   end
 
   private

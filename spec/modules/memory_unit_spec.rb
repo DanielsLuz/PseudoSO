@@ -80,6 +80,11 @@ describe MemoryUnit do
   end
 
   describe "#test" do
+    it "returns true if process ok" do
+      process = ProcessUnit.new(0, 2, 0, 7, 64, 1, 0, 0, 0)
+      expect(memory_unit.test(process)).to eq true
+    end
+
     it "raises an error when big real time process" do
       big_process = ProcessUnit.new(0, 2, 0, 7, 65, 1, 0, 0, 0)
       expect { memory_unit.test(big_process) }.to raise_error(MemoryUnit::ProcessTooBigError)

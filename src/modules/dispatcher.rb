@@ -20,6 +20,7 @@ class Dispatcher
     load_files_data(Resources.file("files.txt"))
     execute
     @logger.info(self, "Final disk: \n#{@disk_unit.disk}")
+    log_discarded_processes if @discarded_processes.any?
   end
 
   def execute
@@ -90,14 +91,22 @@ class Dispatcher
 
   def arriving_processes
     possible = @processes.select {|proc| proc.init_time == @processor_time }
-    possible.each do |process|
+    return [] if possible.empty?
+    @logger.info(self, "#{possible.count} arriving processes at time #{@processor_time}")
+    possible.select do |process|
       begin
         @memory_unit.test(process)
-      rescue MemoryUnit::ProcessTooBigError
-        possible.delete(process) && @processes.delete(process)
-        @discarded_processes << process
+      rescue MemoryUnit::ProcessTooBigError => exception
+        discard(exception.class, process)
+        false
       end
     end
+  end
+
+  def discard(reason, process)
+    @logger.info(self, "Discarding process... Reason #{reason}\n#{process.attributes}")
+    @processes.delete(process)
+    @discarded_processes << [reason, process]
   end
 
   def alocate_memory(process)
@@ -120,6 +129,13 @@ class Dispatcher
       id, operation, data, size = instruction.split(",").map(&:strip)
       process = @processes.select {|proc| proc.id == id.to_i }.first
       process.replace_default_instruction(operation, data, size) if process
+    end
+  end
+
+  def log_discarded_processes
+    @logger.info(self, "Discarded processes:")
+    @discarded_processes.each do |reason, process|
+      @logger.info(self, "#{reason} => #{process.attributes}")
     end
   end
 end

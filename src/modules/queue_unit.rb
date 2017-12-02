@@ -53,7 +53,7 @@ class QueueUnit
 
   def push_batch(process_array)
     return if process_array.empty?
-    @logger.info(self, "Number of arriving processes: #{process_array.count}")
+    @logger.info(self, "Pushing processes to priority queues...")
     process_array.each do |process|
       push(process)
       @logger.info(self, process.print)
