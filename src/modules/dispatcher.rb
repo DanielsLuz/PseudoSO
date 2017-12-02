@@ -16,8 +16,8 @@ class Dispatcher
 
   def run
     @logger.info(self, "Starting OS...")
-    load_processes(Resources.file("processes.txt"))
-    load_files_data(Resources.file("files.txt"))
+    load_resources
+    @logger.info(self, "Initial disk: \n#{@disk_unit.disk}")
     execute
     @logger.info(self, "Final disk: \n#{@disk_unit.disk}")
     log_discarded_processes if @discarded_processes.any?
@@ -65,6 +65,11 @@ class Dispatcher
     @io_resource_unit.dealocate_devices(process.id)
   end
 
+  def load_resources
+    load_processes(Resources.file("processes.txt"))
+    load_files_data(Resources.file("files.txt"))
+  end
+
   def load_processes(filename)
     File.readlines(filename).each_with_index do |line, index|
       @processes << ProcessUnit.new(index, *line.split(",").map(&:to_i))
@@ -80,7 +85,6 @@ class Dispatcher
 
     perform_writing(lines[2, write_operations])
     load_instructions(lines[write_operations + 2..-1])
-    @logger.info(self, "Initial disk: \n#{@disk_unit.disk}")
   end
 
   private
@@ -90,17 +94,17 @@ class Dispatcher
   end
 
   def arriving_processes
-    possible = @processes.select {|proc| proc.init_time == @processor_time }
-    return [] if possible.empty?
-    @logger.info(self, "#{possible.count} arriving processes at time #{@processor_time}")
-    possible.select do |process|
-      begin
-        @memory_unit.test(process)
-      rescue MemoryUnit::ProcessTooBigError => exception
-        discard(exception.class, process)
-        false
-      end
-    end
+    arriving = @processes.select {|proc| proc.init_time == @processor_time }
+                         .select {|process| valid_process?(process) }
+    @logger.info(self, "#{arriving.count} arriving processes at time #{@processor_time}") if arriving.any?
+    arriving
+  end
+
+  def valid_process?(process)
+    @memory_unit.test(process)
+  rescue MemoryUnit::ProcessTooBigError => exception
+    discard(exception.class, process)
+    false
   end
 
   def discard(reason, process)
