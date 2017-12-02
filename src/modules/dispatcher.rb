@@ -1,6 +1,7 @@
 class Dispatcher
   attr_accessor :processes
   attr_reader :processor_time, :disk_unit, :queue_unit, :memory_unit, :io_resource_unit
+  attr_reader :discarded_processes
 
   def initialize
     @processes = Concurrent::Array.new []
@@ -10,6 +11,7 @@ class Dispatcher
     @io_resource_unit = IOResourceUnit.new
     @processor_time = 0
     @logger = OSLog.instance
+    @discarded_processes = []
   end
 
   def run
@@ -62,10 +64,6 @@ class Dispatcher
     @io_resource_unit.dealocate_devices(process.id)
   end
 
-  def arriving_processes
-    @processes.select {|proc| proc.init_time == @processor_time }
-  end
-
   def load_processes(filename)
     File.readlines(filename).each_with_index do |line, index|
       @processes << ProcessUnit.new(index, *line.split(",").map(&:to_i))
@@ -88,6 +86,18 @@ class Dispatcher
 
   def default_instruction
     @logger.info(self, "Executing default instruction...")
+  end
+
+  def arriving_processes
+    possible = @processes.select {|proc| proc.init_time == @processor_time }
+    possible.each do |process|
+      begin
+        @memory_unit.test(process)
+      rescue MemoryUnit::ProcessTooBigError
+        possible.delete(process) && @processes.delete(process)
+        @discarded_processes << process
+      end
+    end
   end
 
   def alocate_memory(process)

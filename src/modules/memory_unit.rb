@@ -11,6 +11,7 @@
 # de usuario. Os metodos dessa classe envolvem operacoes 
 # de escrita e delecao de "processos" na memoria simulada.
 class MemoryUnit
+  class ProcessTooBigError < StandardError; end
 
   # Construtor responsavel pela inicializacao dos 
   # arrays que armazenam os processos de tempo real 
@@ -55,6 +56,11 @@ class MemoryUnit
     (@real_time_memory + @user_memory).reject(&:nil?).count
   end
 
+  def test(process)
+    memory = process.real_time_process? ? @real_time_memory : @user_memory
+    raise ProcessTooBigError if process.memory_blocks > memory.size
+  end
+
   private
 
   # Metodo responsavel pela escritao de
@@ -77,5 +83,4 @@ class MemoryUnit
     }
     initial_address
   end
-
 end

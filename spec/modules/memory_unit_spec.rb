@@ -79,6 +79,18 @@ describe MemoryUnit do
     end
   end
 
+  describe "#test" do
+    it "raises an error when big real time process" do
+      big_process = ProcessUnit.new(0, 2, 0, 7, 65, 1, 0, 0, 0)
+      expect { memory_unit.test(big_process) }.to raise_error(MemoryUnit::ProcessTooBigError)
+    end
+
+    it "raises an error when big user process " do
+      big_process = ProcessUnit.new(1, 2, 0, 7, 961, 1, 0, 0, 0)
+      expect { memory_unit.test(big_process) }.to raise_error(MemoryUnit::ProcessTooBigError)
+    end
+  end
+
   describe "#written_blocks" do
     it "returns correctly" do
       memory_unit = MemoryUnit.new(Concurrent::Array.new(64), written_user_memory)

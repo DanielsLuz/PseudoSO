@@ -36,6 +36,8 @@ describe Dispatcher do
 
     context "when escalonating" do
       let(:process_init_time0) { ProcessUnit.new(0, 0, 0, 7, 64, 1, 0, 0, 0) }
+      let(:big_process_init_time0) { ProcessUnit.new(0, 0, 0, 7, 1000, 1, 0, 0, 0) }
+
       it "pushes processes that start at that processor time" do
         dispatcher.processes = [process_init_time0, process_init_time1]
         dispatcher.step
@@ -43,7 +45,15 @@ describe Dispatcher do
         expect(dispatcher.queue_unit.queues[1]).to_not include(process_init_time1)
       end
 
-      it "does not push process bigger than memory"
+      it "discards process bigger than memory" do
+        dispatcher.processes = [big_process_init_time0, process_init_time0]
+        dispatcher.step
+        expect(dispatcher.queue_unit.queues[0]).to_not include(big_process_init_time0)
+        expect(dispatcher.queue_unit.queues[0]).to include(process_init_time0)
+        expect(dispatcher.processes).to_not include(big_process_init_time0)
+        expect(dispatcher.processes).to include(process_init_time0)
+        expect(dispatcher.discarded_processes).to include(big_process_init_time0)
+      end
     end
   end
 
