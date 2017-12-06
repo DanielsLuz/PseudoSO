@@ -30,6 +30,7 @@ class Dispatcher
   def step
     @queue_unit.push_batch(arriving_processes)
     process = @queue_unit.pop
+    @queue_unit.age_queues
     execute_process(process) if process
     @processor_time += 1
   end
