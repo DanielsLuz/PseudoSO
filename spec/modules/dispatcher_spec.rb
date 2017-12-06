@@ -1,25 +1,6 @@
 describe Dispatcher do
   subject(:dispatcher) { Dispatcher.new }
 
-  xdescribe "#run" do
-    before(:each) do
-      disk_unit = DiskUnit.new(10)
-
-      @process0 = ProcessUnit.new(0, 2, 0, 7, 64, 1, 0, 0, 0)
-      @process0.replace_default_instruction("0", "B", "2")
-
-      @dispatcher = Dispatcher.new
-      @dispatcher.processes << @process0
-      allow(@dispatcher).to receive(:disk_unit).and_return(disk_unit)
-    end
-
-    it "runs until the queue is empty" do
-      @dispatcher.run
-      expect(@dispatcher.processes).to be_empty
-      expect(@dispatcher.processor_time).to eq @process0.instructions.count + 1
-    end
-  end
-
   describe "#step" do
     let(:process_init_time0) { ProcessUnit.new(0, 0, 0, 7, 64, 1, 0, 0, 0) }
     let(:process_init_time1) { ProcessUnit.new(1, 1, 1, 7, 64, 1, 0, 0, 0) }
